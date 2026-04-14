@@ -2,7 +2,7 @@
   "name": "EREMEDIUM — Excel Viewer",
   "short_name": "EREMEDIUM",
   "description": "Import, filter, and search Excel data on any device",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#051520",

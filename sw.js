@@ -1,11 +1,14 @@
-const CACHE_NAME = 'excel-viewer-v2';
+const CACHE_NAME = 'excel-viewer-v3';
 const ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/app.js',
   './manifest.json',
-  './Data.xlsx',  
+  './Data.xlsx',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/eremedium-logo.svg',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
@@ -27,6 +30,12 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(response => {
+      if (response && response.status === 200 && response.type !== 'opaque') {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, responseClone));
+      }
+      return response;
+    }).catch(() => cached))
   );
 });
