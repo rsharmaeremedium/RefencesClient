@@ -482,17 +482,21 @@ function showToast(msg, dur = 2800) {
 function showLoading(show) {
   loadingOverlay.classList.toggle('show', show);
 }
-window.addEventListener('load', () => {
-  fetch('Data.xlsx')
-    .then(res => res.arrayBuffer())
-    .then(data => {
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json(sheet);
+window.addEventListener('load', async () => {
+  try {
+    console.log("Auto loading Excel...");
 
-      console.log(json);
+    const res = await fetch('./Data.xlsx');
+    const buf = await res.arrayBuffer();
 
-      document.getElementById('output').innerText =
-        JSON.stringify(json, null, 2);
-    });
+    const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+
+    // ✅ THIS is the key (your app logic)
+    processWorkbook(wb);
+
+    showToast('✅ Data.xlsx auto loaded');
+  } catch (err) {
+    console.error("Auto load failed:", err);
+    showToast('❌ Failed to auto load Excel');
+  }
 });
