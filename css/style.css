@@ -326,6 +326,19 @@ header {
   flex: 1; min-width: 120px;
 }
 
+#filter-dropdown {
+  padding: 6px 10px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+
 .active-filters {
   display: flex;
   flex-wrap: wrap;

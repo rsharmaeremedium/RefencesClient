@@ -221,16 +221,36 @@ function updateFilterInput() {
   const column = filterSelect.value;
   const dropdownColumns = ['product category', 'speciality'];
   const isDropdown = column && dropdownColumns.includes(column.toLowerCase());
+  const isMultiselect = column && column.toLowerCase() === 'speciality';
+
   filterValue.style.display = isDropdown ? 'none' : 'inline-block';
   filterDropdown.style.display = isDropdown ? 'inline-block' : 'none';
+
+  if (isMultiselect) {
+    filterDropdown.setAttribute('multiple', 'multiple');
+    filterDropdown.setAttribute('size', '5');
+  } else {
+    filterDropdown.removeAttribute('multiple');
+    filterDropdown.setAttribute('size', '1');
+  }
+
   filterDropdown.innerHTML = '';
 
   if (isDropdown) {
-    const values = Array.from(new Set(state.allRows.map(r => String(r[column] ?? '').trim()).filter(Boolean))).sort();
-    const placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = `— select ${column.toLowerCase()} —`;
-    filterDropdown.appendChild(placeholder);
+    let values;
+    if (column.toLowerCase() === 'speciality') {
+      values = [
+        'Dental', 'OBS', 'Ophthalmology', 'Dermatology', 'GP', 'Cardiology',
+        'Orthopaedic', 'Physiotherapy', 'Diabetologist', 'Paediatrician',
+        'Neurology', 'Radiology', 'Homeopathy', 'Not', 'Nephrology',
+        'Gastroenterology', 'Dietetics', 'ENT', 'PSYCHIATRY', 'Oncology',
+        'Pathology', 'Urology', 'Rheumatology', 'Pulmonology', 'General',
+        'Vascular', 'Interventional', 'Critical', 'Proctology', 'Plastic'
+      ];
+    } else {
+      values = Array.from(new Set(state.allRows.map(r => String(r[column] ?? '').trim()).filter(Boolean))).sort();
+    }
+
     values.forEach(val => {
       const opt = document.createElement('option');
       opt.value = val;
@@ -241,18 +261,35 @@ function updateFilterInput() {
 }
 
 function getFilterValue() {
-  return filterSelect.value && filterDropdown.style.display === 'inline-block'
-    ? filterDropdown.value
-    : filterValue.value;
+  if (filterSelect.value && filterDropdown.style.display === 'inline-block') {
+    if (filterDropdown.hasAttribute('multiple')) {
+      const selected = Array.from(filterDropdown.selectedOptions).map(opt => opt.value);
+      return selected.length > 0 ? selected : null;
+    } else {
+      return filterDropdown.value;
+    }
+  }
+  return filterValue.value;
 }
 
 $('add-filter-btn').addEventListener('click', () => {
   const col = filterSelect.value;
-  const val = getFilterValue().trim();
-  if (!col || !val) { showToast('⚠️ Select a column and enter a value'); return; }
-  state.filters.push({ col, val: val.toLowerCase() });
+  const val = getFilterValue();
+  if (!col || (!val || (Array.isArray(val) && val.length === 0))) {
+    showToast('⚠️ Select a column and enter a value');
+    return;
+  }
+
+  if (Array.isArray(val)) {
+    // Handle multiselect speciality
+    state.filters.push({ col, val });
+  } else {
+    state.filters.push({ col, val: val.trim().toLowerCase() });
+  }
+
   filterValue.value = '';
-  filterDropdown.value = '';
+  // Clear multiselect
+  Array.from(filterDropdown.options).forEach(opt => opt.selected = false);
   state.page = 1;
   applyFiltersAndRender();
   renderActiveFilters();
@@ -276,7 +313,8 @@ function renderActiveFilters() {
   state.filters.forEach((f, i) => {
     const chip = document.createElement('div');
     chip.className = 'filter-chip';
-    chip.innerHTML = `<span>${f.col}: "${f.val}"</span><button onclick="removeFilter(${i})">×</button>`;
+    const displayVal = Array.isArray(f.val) ? f.val.join(', ') : f.val;
+    chip.innerHTML = `<span>${f.col}: "${displayVal}"</span><button onclick="removeFilter(${i})">×</button>`;
     activeFilters.appendChild(chip);
   });
 }
@@ -334,7 +372,15 @@ function applyFiltersAndRender() {
 
   // Column filters
   state.filters.forEach(({ col, val }) => {
-    rows = rows.filter(row => String(row[col] ?? '').toLowerCase().includes(val));
+    if (Array.isArray(val)) {
+      // Handle multiselect (e.g., speciality)
+      rows = rows.filter(row => {
+        const rowVal = String(row[col] ?? '').toLowerCase();
+        return val.some(v => rowVal.includes(v.toLowerCase()));
+      });
+    } else {
+      rows = rows.filter(row => String(row[col] ?? '').toLowerCase().includes(val));
+    }
   });
 
   // Sort
@@ -592,11 +638,7 @@ function shareSelected() {
   const text = selectedData.map((row, index) => {
     const values = fields.map(field => {
       let raw = row[field] ?? row[field.toLowerCase()] ?? row[field.toUpperCase()] ?? '';
-      raw = String(raw).trim();
-      if (field.toLowerCase() === 'speciality' && raw) {
-        raw = raw.split(/[,|\/]/).map(s => s.trim()).filter(Boolean).join('; ');
-      }
-      return raw || '—';
+      return String(raw).trim() || '—';
     }).join('\n');
     return `${index + 1}.\n${values}`;
   }).join('\n\n');
