@@ -242,7 +242,7 @@ function updateFilterInput() {
       values = [
         'Dental', 'OBS', 'Ophthalmology', 'Dermatology', 'GP', 'Cardiology',
         'Orthopaedic', 'Physiotherapy', 'Diabetologist', 'Paediatrician',
-        'Neurology', 'Radiology', 'Homeopathy', 'Not', 'Nephrology',
+        'Neurology', 'Radiology', 'Homeopathy', 'Nephrology',
         'Gastroenterology', 'Dietetics', 'ENT', 'PSYCHIATRY', 'Oncology',
         'Pathology', 'Urology', 'Rheumatology', 'Pulmonology', 'General',
         'Vascular', 'Interventional', 'Critical', 'Proctology', 'Plastic'
