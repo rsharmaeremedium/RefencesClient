@@ -616,7 +616,7 @@ function updateSelectedUI() {
   if (!shareBtn) return;
   if (state.selectedRows.size > 0) {
     shareBtn.style.display = 'flex';
-    shareBtn.textContent = `📤 Share (${state.selectedRows.size})`;
+    shareBtn.title = `Share ${state.selectedRows.size} selected row${state.selectedRows.size === 1 ? '' : 's'}`;
   } else {
     shareBtn.style.display = 'none';
   }
