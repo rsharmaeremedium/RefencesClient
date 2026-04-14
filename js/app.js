@@ -591,8 +591,12 @@ function shareSelected() {
 
   const text = selectedData.map((row, index) => {
     const values = fields.map(field => {
-      const raw = row[field] ?? row[field.toLowerCase()] ?? row[field.toUpperCase()] ?? '';
-      return String(raw).trim() || '—';
+      let raw = row[field] ?? row[field.toLowerCase()] ?? row[field.toUpperCase()] ?? '';
+      raw = String(raw).trim();
+      if (field.toLowerCase() === 'speciality' && raw) {
+        raw = raw.split(/[,|\/]/).map(s => s.trim()).filter(Boolean).join('; ');
+      }
+      return raw || '—';
     }).join('\n');
     return `${index + 1}.\n${values}`;
   }).join('\n\n');
