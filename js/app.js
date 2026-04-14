@@ -592,10 +592,10 @@ function shareSelected() {
   const text = selectedData.map((row, index) => {
     const values = fields.map(field => {
       const raw = row[field] ?? row[field.toLowerCase()] ?? row[field.toUpperCase()] ?? '';
-      return `${field}: ${String(raw).trim() || '—'}`;
-    }).join(' | ');
-    return `${index + 1}. ${values}`;
-  }).join('\n');
+      return String(raw).trim() || '—';
+    }).join('\n');
+    return `${index + 1}.\n${values}`;
+  }).join('\n\n');
   
   if (navigator.share) {
     navigator.share({
