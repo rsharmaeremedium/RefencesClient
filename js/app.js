@@ -645,7 +645,7 @@ function shareSelected() {
   
   if (navigator.share) {
     navigator.share({
-      title: `Clients - ${selectedData.length} items`,
+      title: `EREMEDIUM - ${selectedData.length} items`,
       text: text,
     }).catch(() => copyToClipboard(text));
   } else {

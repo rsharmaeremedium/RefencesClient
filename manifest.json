@@ -1,6 +1,6 @@
 {
-  "name": "Clients — Excel Viewer",
-  "short_name": "Clients",
+  "name": "EREMEDIUM — Excel Viewer",
+  "short_name": "EREMEDIUM",
   "description": "Import, filter, and search Excel data on any device",
   "start_url": "/RefencesClient/",
   "scope": "/RefencesClient/",
