@@ -3,10 +3,10 @@
   "short_name": "Clients",
   "description": "Import, filter, and search Excel data on any device",
   "start_url": "/RefencesClient/",
-  "scope": "/RefencesClient/"
+  "scope": "/RefencesClient/",
   "display": "standalone",
-  "background_color": "#0f0f13",
-  "theme_color": "#7c3aed",
+  "background_color": "#051520",
+  "theme_color": "#1dc7d0",
   "orientation": "any",
   "icons": [
     {
