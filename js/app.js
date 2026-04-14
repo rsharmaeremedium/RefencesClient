@@ -482,3 +482,17 @@ function showToast(msg, dur = 2800) {
 function showLoading(show) {
   loadingOverlay.classList.toggle('show', show);
 }
+window.addEventListener('load', () => {
+  fetch('Data.xlsx')
+    .then(res => res.arrayBuffer())
+    .then(data => {
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      console.log(json);
+
+      document.getElementById('output').innerText =
+        JSON.stringify(json, null, 2);
+    });
+});

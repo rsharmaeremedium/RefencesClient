@@ -2,7 +2,8 @@
   "name": "DataLens — Excel Viewer",
   "short_name": "DataLens",
   "description": "Import, filter, and search Excel data on any device",
-  "start_url": "/",
+  "start_url": "/RefencesClient/",
+  "scope": "/RefencesClient/"
   "display": "standalone",
   "background_color": "#0f0f13",
   "theme_color": "#7c3aed",

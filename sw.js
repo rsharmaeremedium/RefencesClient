@@ -1,10 +1,12 @@
-const CACHE_NAME = 'excel-viewer-v1';
+const CACHE_NAME = 'excel-viewer-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/manifest.json',
+  const ASSETS = [
+  '/RefencesClient/',
+  '/RefencesClient/index.html',
+  '/RefencesClient/css/style.css',
+  '/RefencesClient/js/app.js',
+  '/RefencesClient/manifest.json',
+  '/RefencesClient/Data.xlsx',  
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
 ];
 
