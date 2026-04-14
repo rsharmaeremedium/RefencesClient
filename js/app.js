@@ -582,14 +582,20 @@ function shareSelected() {
     return;
   }
   
-  const selectedData = [];
-  state.selectedRows.forEach(idx => {
-    if (state.filteredRows[idx]) {
-      selectedData.push(state.filteredRows[idx]);
-    }
-  });
-  
-  const text = [state.columns.join('\t'), ...selectedData.map(r => state.columns.map(c => r[c] ?? '').join('\t'))].join('\n');
+  const selectedIndexes = Array.from(state.selectedRows).sort((a, b) => a - b);
+  const fields = ['Deal Name', 'Product Category', 'Speciality', 'Address'];
+
+  const selectedData = selectedIndexes
+    .map(idx => state.filteredRows[idx])
+    .filter(Boolean);
+
+  const text = selectedData.map((row, index) => {
+    const values = fields.map(field => {
+      const raw = row[field] ?? row[field.toLowerCase()] ?? row[field.toUpperCase()] ?? '';
+      return `${field}: ${String(raw).trim() || '—'}`;
+    }).join(' | ');
+    return `${index + 1}. ${values}`;
+  }).join('\n');
   
   if (navigator.share) {
     navigator.share({
