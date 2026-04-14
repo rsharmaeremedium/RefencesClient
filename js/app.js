@@ -43,11 +43,28 @@ const installBanner = $('install-banner');
 // ── PWA Install ────────────────────────────────────────────
 let deferredPrompt = null;
 
+// Detect iOS Safari
+function isIOSSafari() {
+  const ua = navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(ua) && /safari/.test(ua) && !/chrome|firefox|edge/.test(ua);
+}
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   installBanner.classList.add('show');
 });
+
+// For iOS Safari, show iOS-specific instructions
+if (isIOSSafari()) {
+  const installText = installBanner.querySelector('.install-text');
+  const installBtn = $('install-btn');
+  if (installText && installBtn) {
+    installText.innerHTML = '📲 To install: tap Share <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin:0 4px"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> then "Add to Home Screen"';
+    installBtn.style.display = 'none';
+  }
+  installBanner.classList.add('show');
+}
 
 $('install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
