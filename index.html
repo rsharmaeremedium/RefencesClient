@@ -4,19 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#7c3aed" />
-  <meta name="description" content="DataLens — Import, filter, search and explore Excel files on any device" />
+  <meta name="description" content="Clients — Import, filter, search and explore Excel files on any device" />
 
   <!-- PWA / Apple -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="DataLens" />
+  <meta name="apple-mobile-web-app-title" content="Clients" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="css/style.css" />
 
-  <title>DataLens — Excel Viewer</title>
+  <title>Clients — Excel Viewer</title>
 </head>
 <body>
 
@@ -24,7 +24,7 @@
 
   <!-- ── INSTALL BANNER ── -->
   <div id="install-banner">
-    <span class="install-text">📲 Install DataLens on your device for offline use</span>
+    <span class="install-text">📲 Install Clients on your device for offline use</span>
     <button class="install-btn" id="install-btn">Install</button>
     <button class="dismiss-btn" id="dismiss-install" aria-label="Dismiss">×</button>
   </div>
@@ -33,7 +33,7 @@
   <header>
     <div class="logo">
       <div class="logo-icon">⬡</div>
-      <span class="logo-text">DataLens</span>
+      <span class="logo-text">Clients</span>
     </div>
     <div class="header-actions">
       <button class="icon-btn" id="new-file-btn" title="Load new file" style="display:none">
@@ -92,6 +92,9 @@
         </button>
         <button class="icon-btn" id="export-btn" title="Export filtered data">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button class="icon-btn" id="share-btn" title="Share selected rows" style="display:none">
+          📤 Share
         </button>
       </div>
     </div>

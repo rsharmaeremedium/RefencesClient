@@ -1,6 +1,6 @@
 {
-  "name": "DataLens — Excel Viewer",
-  "short_name": "DataLens",
+  "name": "Clients — Excel Viewer",
+  "short_name": "Clients",
   "description": "Import, filter, and search Excel data on any device",
   "start_url": "/RefencesClient/",
   "scope": "/RefencesClient/"

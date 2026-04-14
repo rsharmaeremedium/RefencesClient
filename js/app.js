@@ -15,6 +15,7 @@ const state = {
   viewMode: 'table',    // 'table' | 'grid'
   page: 1,
   pageSize: 50,
+  selectedRows: new Set(),  // Track selected row indices
 };
 
 // ── DOM ────────────────────────────────────────────────────
@@ -184,6 +185,7 @@ function switchSheet(name) {
   state.sortCol = null;
   state.sortDir = 'asc';
   state.page = 1;
+  state.selectedRows.clear();
   searchInput.value = '';
 
   $$('.sheet-tab').forEach(t => t.classList.toggle('active', t.textContent === name));
@@ -281,6 +283,8 @@ $('export-btn').addEventListener('click', () => {
   XLSX.writeFile(wb, `export_${Date.now()}.xlsx`);
   showToast('📥 Exported ' + state.filteredRows.length + ' rows');
 });
+
+$('share-btn').addEventListener('click', shareSelected);
 
 // ── Core: Filter + Sort + Render ──────────────────────────
 function applyFiltersAndRender() {
@@ -383,6 +387,7 @@ function renderCurrentPage() {
     tableContainer.classList.add('active');
     gridContainer.classList.remove('active');
     renderTable(rows);
+    updateSelectedUI();
   } else {
     tableContainer.classList.remove('active');
     gridContainer.classList.add('active');
@@ -402,13 +407,16 @@ function renderTable(rows) {
   }
 
   const q = state.searchQuery;
+  const start = (state.page - 1) * state.pageSize;
 
-  const thead = `<thead><tr>${state.columns.map(col => {
+  const thead = `<thead><tr><th class="checkbox-col"><input type="checkbox" id="select-all-rows" title="Select all rows"/></th>${state.columns.map(col => {
     const cls = state.sortCol === col ? (state.sortDir === 'asc' ? ' sort-asc' : ' sort-desc') : '';
     return `<th class="${cls}" data-col="${escHtml(col)}">${escHtml(col)}</th>`;
   }).join('')}</tr></thead>`;
 
-  const tbody = '<tbody>' + rows.map(row => {
+  const tbody = '<tbody>' + rows.map((row, idx) => {
+    const rowIdx = start + idx;
+    const isSelected = state.selectedRows.has(rowIdx);
     const cells = state.columns.map(col => {
       let val = row[col] ?? '';
       const raw = String(val);
@@ -428,10 +436,50 @@ function renderTable(rows) {
       }
       return `<td class="${cls}" title="${escHtml(raw)}">${display}</td>`;
     }).join('');
-    return `<tr>${cells}</tr>`;
+    return `<tr class="${isSelected ? 'row-selected' : ''}" data-row-idx="${rowIdx}"><td class="checkbox-col"><input type="checkbox" class="row-checkbox" ${isSelected ? 'checked' : ''} /></td>${cells}</tr>`;
   }).join('') + '</tbody>';
 
   tableContainer.innerHTML = `<table>${thead}${tbody}</table>`;
+
+  // Checkbox handlers
+  const selectAllCheckbox = tableContainer.querySelector('#select-all-rows');
+  const rowCheckboxes = tableContainer.querySelectorAll('.row-checkbox');
+  
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener('change', () => {
+      rowCheckboxes.forEach((cb, i) => {
+        const rowIdx = start + i;
+        if (selectAllCheckbox.checked) {
+          state.selectedRows.add(rowIdx);
+        } else {
+          state.selectedRows.delete(rowIdx);
+        }
+        cb.checked = selectAllCheckbox.checked;
+      });
+      updateSelectedUI();
+    });
+  }
+  
+  rowCheckboxes.forEach((cb, i) => {
+    const rowIdx = start + i;
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        state.selectedRows.add(rowIdx);
+      } else {
+        state.selectedRows.delete(rowIdx);
+      }
+      if (selectAllCheckbox) {
+        selectAllCheckbox.checked = rowCheckboxes.length > 0 && Array.from(rowCheckboxes).every(c => c.checked);
+      }
+      updateSelectedUI();
+    });
+    cb.closest('tr').addEventListener('click', (e) => {
+      if (e.target !== cb) {
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+      }
+    });
+  });
 
   // Sort click handlers
   tableContainer.querySelectorAll('th[data-col]').forEach(th => {
@@ -481,6 +529,50 @@ function showToast(msg, dur = 2800) {
 
 function showLoading(show) {
   loadingOverlay.classList.toggle('show', show);
+}
+
+function updateSelectedUI() {
+  const shareBtn = $('share-btn');
+  if (!shareBtn) return;
+  if (state.selectedRows.size > 0) {
+    shareBtn.style.display = 'flex';
+    shareBtn.textContent = `📤 Share (${state.selectedRows.size})`;
+  } else {
+    shareBtn.style.display = 'none';
+  }
+}
+
+function shareSelected() {
+  if (state.selectedRows.size === 0) {
+    showToast('⚠️ Select rows to share');
+    return;
+  }
+  
+  const selectedData = [];
+  state.selectedRows.forEach(idx => {
+    if (state.filteredRows[idx]) {
+      selectedData.push(state.filteredRows[idx]);
+    }
+  });
+  
+  const text = [state.columns.join('\t'), ...selectedData.map(r => state.columns.map(c => r[c] ?? '').join('\t'))].join('\n');
+  
+  if (navigator.share) {
+    navigator.share({
+      title: `Clients - ${selectedData.length} items`,
+      text: text,
+    }).catch(() => copyToClipboard(text));
+  } else {
+    copyToClipboard(text);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`✅ Copied ${state.selectedRows.size} row(s) to clipboard`);
+  }).catch(() => {
+    showToast('❌ Failed to copy');
+  });
 }
 window.addEventListener('load', async () => {
   try {

@@ -450,6 +450,24 @@ td {
 tr:nth-child(odd) td { background: var(--row-odd); }
 tr:nth-child(even) td { background: var(--row-even); }
 tr:hover td { background: var(--row-hover) !important; }
+tr.row-selected td { background: rgba(124, 58, 237, 0.2) !important; }
+
+.checkbox-col {
+  width: 40px;
+  padding: 10px 8px !important;
+  text-align: center;
+}
+
+.checkbox-col input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.row-checkbox {
+  cursor: pointer;
+}
 
 .cell-number { color: var(--accent2); font-variant-numeric: tabular-nums; }
 .cell-date { color: #93c5fd; }
