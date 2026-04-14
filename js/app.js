@@ -29,6 +29,7 @@ const searchInput   = $('search-input');
 const filterBar     = $('filter-bar');
 const filterSelect  = $('filter-select');
 const filterValue   = $('filter-value');
+const filterDropdown= $('filter-dropdown');
 const activeFilters = $('active-filters');
 const sheetTabs     = $('sheet-tabs');
 const tableContainer = $('table-container');
@@ -213,18 +214,51 @@ function buildFilterSelect() {
     opt.textContent = col;
     filterSelect.appendChild(opt);
   });
+  updateFilterInput();
+}
+
+function updateFilterInput() {
+  const column = filterSelect.value;
+  const dropdownColumns = ['product category', 'speciality'];
+  const isDropdown = column && dropdownColumns.includes(column.toLowerCase());
+  filterValue.style.display = isDropdown ? 'none' : 'inline-block';
+  filterDropdown.style.display = isDropdown ? 'inline-block' : 'none';
+  filterDropdown.innerHTML = '';
+
+  if (isDropdown) {
+    const values = Array.from(new Set(state.allRows.map(r => String(r[column] ?? '').trim()).filter(Boolean))).sort();
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = `— select ${column.toLowerCase()} —`;
+    filterDropdown.appendChild(placeholder);
+    values.forEach(val => {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = val;
+      filterDropdown.appendChild(opt);
+    });
+  }
+}
+
+function getFilterValue() {
+  return filterSelect.value && filterDropdown.style.display === 'inline-block'
+    ? filterDropdown.value
+    : filterValue.value;
 }
 
 $('add-filter-btn').addEventListener('click', () => {
   const col = filterSelect.value;
-  const val = filterValue.value.trim();
+  const val = getFilterValue().trim();
   if (!col || !val) { showToast('⚠️ Select a column and enter a value'); return; }
   state.filters.push({ col, val: val.toLowerCase() });
   filterValue.value = '';
+  filterDropdown.value = '';
   state.page = 1;
   applyFiltersAndRender();
   renderActiveFilters();
 });
+
+filterSelect.addEventListener('change', updateFilterInput);
 
 filterValue.addEventListener('keydown', e => {
   if (e.key === 'Enter') $('add-filter-btn').click();
