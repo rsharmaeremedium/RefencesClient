@@ -22,12 +22,25 @@
   --chip-bg: #112f3e;
 }
 
-html, body {
+html {
   height: 100%;
   font-family: 'DM Mono', monospace;
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body.pwa-standalone {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
 }
 
 /* ── LAYOUT ── */
@@ -42,7 +55,7 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) 20px 14px;
+  padding: 14px 20px;
   background: var(--header-bg);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;

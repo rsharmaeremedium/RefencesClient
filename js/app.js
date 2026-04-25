@@ -78,6 +78,17 @@ if (isIOSSafari() && !isInstalled()) {
   installBanner.classList.add('show');
 }
 
+function applyPWAStandaloneClass() {
+  if (isInstalled()) {
+    document.body.classList.add('pwa-standalone');
+  } else {
+    document.body.classList.remove('pwa-standalone');
+  }
+}
+
+applyPWAStandaloneClass();
+window.matchMedia('(display-mode: standalone)').addEventListener('change', applyPWAStandaloneClass);
+
 $('install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
