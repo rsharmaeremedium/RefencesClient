@@ -433,16 +433,8 @@ header {
 
 /* ── SHEET TABS ── */
 .sheet-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 8px 16px 0;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  flex-shrink: 0;
-  scrollbar-width: none;
+  display: none;
 }
-.sheet-tabs::-webkit-scrollbar { display: none; }
 
 .sheet-tab {
   padding: 7px 14px;

@@ -223,13 +223,7 @@ header {
 }
 
 .sheet-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 12px 20px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  flex-shrink: 0;
+  display: none;
 }
 
 .sheet-tab {
