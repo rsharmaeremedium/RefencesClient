@@ -49,6 +49,11 @@ function isIOSSafari() {
   return /iphone|ipad|ipod/.test(ua) && /safari/.test(ua) && !/chrome|firefox|edge/.test(ua);
 }
 
+// Check if running as installed PWA
+function isInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
@@ -62,8 +67,8 @@ window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
 });
 
-// For iOS Safari, show iOS-specific instructions
-if (isIOSSafari()) {
+// For iOS Safari, show iOS-specific instructions if not already installed
+if (isIOSSafari() && !isInstalled()) {
   const installText = installBanner.querySelector('.install-text');
   const installBtn = $('install-btn');
   if (installText && installBtn) {
