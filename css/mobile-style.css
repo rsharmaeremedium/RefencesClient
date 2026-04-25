@@ -408,21 +408,26 @@ header {
 /* ── TABLE ── */
 .table-container {
   flex: 1;
-  overflow: auto;
+  overflow-x: auto; /* Allow horizontal scroll if needed, but try to fit */
   background: var(--surface);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 12px;
+  table-layout: fixed; /* Helps fit columns */
 }
 
 th, td {
-  padding: 12px 16px;
+  padding: 8px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border);
-  min-width: 120px;
+  min-width: 80px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 th {
