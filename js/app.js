@@ -92,18 +92,26 @@ applyPWAStandaloneClass();
 window.matchMedia('(display-mode: standalone)').addEventListener('change', applyPWAStandaloneClass);
 
 // ── Refresh Button ─────────────────────────────────────────
-$('refresh-btn').addEventListener('click', async () => {
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    const registration = await navigator.serviceWorker.ready;
-    registration.update().then(() => {
-      showToast('🔄 Checking for updates...');
-    }).catch(() => {
-      showToast('❌ Update check failed');
-    });
-  } else {
-    // Fallback: just reload
-    window.location.reload();
+async function clearPWAData() {
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(key => caches.delete(key)));
   }
+}
+
+$('refresh-btn').addEventListener('click', async () => {
+  showToast('🔄 Clearing cached data and reloading…');
+  try {
+    await clearPWAData();
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.update();
+    }
+  } catch (error) {
+    console.warn('Refresh failed to clear caches:', error);
+  }
+
+  window.location.reload();
 });
 
 $('install-btn').addEventListener('click', async () => {
