@@ -1,4 +1,4 @@
-const CACHE_NAME = 'excel-viewer-v4';
+const CACHE_NAME = 'excel-viewer-v5';
 const ASSETS = [
   './',
   './index.html',
