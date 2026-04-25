@@ -86,7 +86,7 @@ async function loadAppVersion() {
     const match = text.match(/const\s+CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
     if (match?.[1]) {
       const version = match[1].split('-').pop();
-      appVersionEl.textContent = version ? `v${version}` : `v${match[1]}`;
+      appVersionEl.textContent = version ? (version.startsWith('v') ? version : `v${version}`) : `v${match[1]}`;
       return;
     }
   } catch (error) {
