@@ -55,6 +55,13 @@ window.addEventListener('beforeinstallprompt', e => {
   installBanner.classList.add('show');
 });
 
+// Listen for app installation
+window.addEventListener('appinstalled', () => {
+  installBanner.classList.remove('show');
+  showToast('✅ App installed!');
+  deferredPrompt = null;
+});
+
 // For iOS Safari, show iOS-specific instructions
 if (isIOSSafari()) {
   const installText = installBanner.querySelector('.install-text');
@@ -70,9 +77,12 @@ $('install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') showToast('✅ App installed!');
   deferredPrompt = null;
-  installBanner.classList.remove('show');
+  if (outcome === 'accepted') {
+    // Toast will be shown by appinstalled event
+  } else {
+    installBanner.classList.remove('show');
+  }
 });
 
 $('dismiss-install').addEventListener('click', () => installBanner.classList.remove('show'));
