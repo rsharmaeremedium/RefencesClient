@@ -81,13 +81,30 @@ if (isIOSSafari() && !isInstalled()) {
 function applyPWAStandaloneClass() {
   if (isInstalled()) {
     document.body.classList.add('pwa-standalone');
+    $('refresh-btn').style.display = 'flex';
   } else {
     document.body.classList.remove('pwa-standalone');
+    $('refresh-btn').style.display = 'none';
   }
 }
 
 applyPWAStandaloneClass();
 window.matchMedia('(display-mode: standalone)').addEventListener('change', applyPWAStandaloneClass);
+
+// ── Refresh Button ─────────────────────────────────────────
+$('refresh-btn').addEventListener('click', async () => {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    const registration = await navigator.serviceWorker.ready;
+    registration.update().then(() => {
+      showToast('🔄 Checking for updates...');
+    }).catch(() => {
+      showToast('❌ Update check failed');
+    });
+  } else {
+    // Fallback: just reload
+    window.location.reload();
+  }
+});
 
 $('install-btn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
@@ -105,7 +122,19 @@ $('dismiss-install').addEventListener('click', () => installBanner.classList.rem
 
 // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js').then(registration => {
+    registration.addEventListener('updatefound', () => {
+      const newWorker = registration.installing;
+      if (newWorker) {
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showToast('🔄 Update available! Refreshing...');
+            setTimeout(() => window.location.reload(), 1000);
+          }
+        });
+      }
+    });
+  }).catch(() => {});
 }
 
 // ── File Handling ──────────────────────────────────────────
