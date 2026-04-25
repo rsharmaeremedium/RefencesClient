@@ -39,6 +39,7 @@ const statsEl       = $('stats');
 const loadingOverlay = $('loading-overlay');
 const toast         = $('toast');
 const installBanner = $('install-banner');
+const appVersionEl  = $('app-version');
 
 // ── PWA Install ────────────────────────────────────────────
 let deferredPrompt = null;
@@ -78,6 +79,22 @@ if (isIOSSafari() && !isInstalled()) {
   installBanner.classList.add('show');
 }
 
+async function loadAppVersion() {
+  if (!appVersionEl) return;
+  try {
+    const text = await fetch(`sw.js?cache-bust=${Date.now()}`, { cache: 'no-store' }).then(r => r.text());
+    const match = text.match(/const\s+CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
+    if (match?.[1]) {
+      const version = match[1].split('-').pop();
+      appVersionEl.textContent = version ? `v${version}` : `v${match[1]}`;
+      return;
+    }
+  } catch (error) {
+    console.warn('Version load failed', error);
+  }
+  appVersionEl.textContent = 'v?';
+}
+
 function applyPWAStandaloneClass() {
   if (isInstalled()) {
     document.body.classList.add('pwa-standalone');
@@ -89,7 +106,11 @@ function applyPWAStandaloneClass() {
 }
 
 applyPWAStandaloneClass();
-window.matchMedia('(display-mode: standalone)').addEventListener('change', applyPWAStandaloneClass);
+loadAppVersion();
+window.matchMedia('(display-mode: standalone)').addEventListener('change', () => {
+  applyPWAStandaloneClass();
+  loadAppVersion();
+});
 
 // ── Refresh Button ─────────────────────────────────────────
 async function clearPWAData() {
@@ -136,7 +157,8 @@ if ('serviceWorker' in navigator) {
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            showToast('🔄 Update available! Refreshing...');
+            loadAppVersion();
+            showToast('🔄 Update installed. Reloading...');
             setTimeout(() => window.location.reload(), 1000);
           }
         });

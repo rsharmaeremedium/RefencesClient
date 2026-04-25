@@ -93,6 +93,14 @@ header {
   -webkit-text-fill-color: transparent;
 }
 
+.app-version {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.2px;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
