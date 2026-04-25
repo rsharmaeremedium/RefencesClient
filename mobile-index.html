@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#1dc7d0" />
-  <meta name="description" content="EREMEDIUM — Import, filter, search and explore Excel files on any device" />
+  <meta name="description" content="EREMEDIUM — Import, filter, search and explore Excel files on mobile devices" />
 
   <!-- PWA / Apple -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -14,9 +14,9 @@
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/mobile-style.css" />
 
-  <title>EREMEDIUM - Clients</title>
+  <title>EREMEDIUM - Mobile</title>
 </head>
 <body>
 
@@ -37,7 +37,7 @@
     </div>
     <div class="header-actions">
       <button class="icon-btn" id="new-file-btn" title="Load new file" style="display:none">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       </button>
     </div>
   </header>
@@ -49,7 +49,7 @@
       <div class="drop-title">Drop your Excel file here</div>
       <p class="drop-sub">Supports .xlsx, .xls, .csv and .ods files<br/>All processing happens locally — your data never leaves your device</p>
       <button class="upload-btn" type="button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         Choose File
       </button>
       <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.ods" style="display:none" />
@@ -76,22 +76,22 @@
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="search-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="search" id="search-input" placeholder="Search across all columns…" autocomplete="off" />
       </div>
       <div class="toolbar-right">
         <div class="stats-badge" id="stats">0 rows</div>
         <button class="icon-btn" id="filter-toggle" title="Toggle filters">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
         </button>
         <button class="icon-btn active" id="view-table" title="Table view">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
         </button>
         <button class="icon-btn" id="view-grid" title="Card view">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         </button>
         <button class="icon-btn" id="export-btn" title="Export filtered data">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
         <button class="icon-btn" id="share-btn" title="Share selected rows" style="display:none">
           <img src="icons/share-button.png" alt="Share" class="share-img" />
@@ -105,7 +105,7 @@
       <select id="filter-select"></select>
       <input type="text" id="filter-value" placeholder="contains…" />
       <select id="filter-dropdown" style="display:none"></select>
-      <button class="upload-btn" id="add-filter-btn" style="padding:7px 14px;font-size:12px;margin:0">+ Add</button>
+      <button class="upload-btn" id="add-filter-btn" style="padding:10px 16px;font-size:14px;margin:0">+ Add</button>
       <button class="clear-filters" id="clear-filters-btn">Clear all</button>
       <div class="active-filters" id="active-filters"></div>
     </div>
