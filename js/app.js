@@ -121,18 +121,28 @@ async function clearPWAData() {
 }
 
 $('refresh-btn').addEventListener('click', async () => {
-  showToast('🔄 Clearing cached data and reloading…');
+  showToast('🔄 Checking for updates and clearing cache…');
   try {
     await clearPWAData();
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       const registration = await navigator.serviceWorker.ready;
       await registration.update();
+      showToast('🔄 Update check complete. Reloading if needed…');
+      // Let the updatefound event handle the reload if an update is available
+      setTimeout(() => {
+        if (!navigator.serviceWorker.controller) {
+          // No update found, just reload
+          window.location.reload();
+        }
+      }, 2000);
+    } else {
+      // No SW, just reload
+      window.location.reload();
     }
   } catch (error) {
-    console.warn('Refresh failed to clear caches:', error);
+    console.warn('Refresh failed:', error);
+    showToast('❌ Refresh failed');
   }
-
-  window.location.reload();
 });
 
 $('install-btn').addEventListener('click', async () => {
