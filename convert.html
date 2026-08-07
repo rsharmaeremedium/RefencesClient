@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1dc7d0" />
+<title>EREMEDIUM - Convert to Reference Client Format</title>
+
+<style>
+  :root { --teal: #1dc7d0; --ink: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --bg: #f9fafb; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; max-width: 480px; width: 100%; text-align: center;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 24px; line-height: 1.5; }
+  .drop {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 32px 16px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .drop.drag-over { border-color: var(--teal); background: #f0fdfe; }
+  .drop svg { color: var(--muted); margin-bottom: 8px; }
+  .drop-title { font-size: 14px; font-weight: 600; margin: 4px 0; }
+  .drop-sub { font-size: 12px; color: var(--muted); margin: 0; }
+  input[type=file] { display: none; }
+  .status { margin-top: 16px; font-size: 13px; color: var(--muted); min-height: 18px; }
+  .status.error { color: #dc2626; }
+  .status.success { color: #059669; }
+  button.download {
+    display: none; margin-top: 16px; width: 100%; padding: 12px; border: none;
+    border-radius: 10px; background: var(--teal); color: #fff; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+  button.download:disabled { opacity: .6; cursor: default; }
+  .footer { margin-top: 20px; font-size: 11px; color: var(--muted); }
+  .footer a { color: var(--teal); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Convert to reference client format</h1>
+  <p class="sub">Drop a HubSpot deals export below. Everything runs locally in your browser — nothing is uploaded anywhere.</p>
+
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Click or drop file to upload">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+    <div class="drop-title">Drop your Excel file here</div>
+    <p class="drop-sub">Supports .xlsx, .xls, .csv</p>
+  </div>
+  <input type="file" id="file-input" accept=".xlsx,.xls,.csv" />
+
+  <div class="status" id="status"></div>
+  <button class="download" id="download-btn">Download formatted file</button>
+
+  <p class="footer">Part of <a href="index.html">EREMEDIUM</a></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  const OUTPUT_COLUMNS = ["Deal Name","Number of Screens","Product Category","Speciality","Deal owner","City","Area","Address","Pin Code"];
+
+  function cleanSemicolons(v) {
+    if (typeof v !== "string") return v;
+    return v.split(" ;").join(",").split(";").join(",");
+  }
+
+  function readWorkbook(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try { resolve(XLSX.read(new Uint8Array(e.target.result), { type: "array" })); }
+        catch (err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  function buildRows(workbook) {
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
+    if (json.length === 0) return { rows: [], missing: [] };
+
+    const sourceCols = Object.keys(json[0]);
+    const missing = OUTPUT_COLUMNS.filter((c) => !sourceCols.includes(c));
+    if (missing.length) return { rows: [], missing };
+
+    const rows = json.map((r) => {
+      const out = {};
+      for (const col of OUTPUT_COLUMNS) out[col] = cleanSemicolons(r[col]);
+      const n = Number(out["Number of Screens"]);
+      if (out["Number of Screens"] !== "" && !Number.isNaN(n)) out["Number of Screens"] = Math.trunc(n);
+      return out;
+    });
+    return { rows, missing: [] };
+  }
+
+  function downloadWorkbook(rows, name) {
+    const ws = XLSX.utils.json_to_sheet(rows, { header: OUTPUT_COLUMNS });
+    ws["!cols"] = [{ wch: 38 }, { wch: 10 }, { wch: 16 }, { wch: 28 }, { wch: 18 }, { wch: 16 }, { wch: 22 }, { wch: 50 }, { wch: 10 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Data");
+    XLSX.writeFile(wb, name);
+  }
+
+  const dropEl = document.getElementById("drop");
+  const fileInput = document.getElementById("file-input");
+  const statusEl = document.getElementById("status");
+  const downloadBtn = document.getElementById("download-btn");
+
+  let currentRows = null;
+  let currentName = "formatted.xlsx";
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = "status" + (kind ? " " + kind : "");
+  }
+
+  dropEl.addEventListener("click", () => fileInput.click());
+  dropEl.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+  dropEl.addEventListener("dragover", (e) => { e.preventDefault(); dropEl.classList.add("drag-over"); });
+  dropEl.addEventListener("dragleave", () => dropEl.classList.remove("drag-over"));
+  dropEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropEl.classList.remove("drag-over");
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener("change", (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+  async function handleFile(file) {
+    downloadBtn.style.display = "none";
+    currentRows = null;
+    setStatus("Reading " + file.name + "…");
+    try {
+      const wb = await readWorkbook(file);
+      const { rows, missing } = buildRows(wb);
+      if (missing.length) {
+        setStatus("Missing required column(s): " + missing.join(", "), "error");
+        return;
+      }
+      currentRows = rows;
+      currentName = file.name.replace(/\.(xlsx|xls|csv)$/i, "") + "_formatted.xlsx";
+      setStatus(rows.length + " rows ready to download.", "success");
+      downloadBtn.style.display = "block";
+    } catch (err) {
+      setStatus("Couldn't read that file: " + err.message, "error");
+    }
+  }
+
+  downloadBtn.addEventListener("click", () => {
+    if (!currentRows) return;
+    downloadBtn.disabled = true;
+    downloadBtn.textContent = "Downloading…";
+    try {
+      downloadWorkbook(currentRows, currentName);
+    } finally {
+      downloadBtn.disabled = false;
+      downloadBtn.textContent = "Download formatted file";
+    }
+  });
+</script>
+
+</body>
+</html>
