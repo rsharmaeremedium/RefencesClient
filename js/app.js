@@ -454,7 +454,7 @@ function handleSort(col) {
 // ── View Mode ──────────────────────────────────────────────
 $('view-table').addEventListener('click', () => { state.viewMode = 'table'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
 $('view-grid').addEventListener('click', () => { state.viewMode = 'grid'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
-$('view-map').addEventListener('click', () => { state.viewMode = 'map'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
+$('view-map').addEventListener('click', () => { state.viewMode = 'map'; $('map-search').value = searchInput.value; updateViewBtns(); renderCurrentPage(); renderPagination(); });
 
 function updateViewBtns() {
   $('view-table').classList.toggle('active', state.viewMode === 'table');
@@ -464,6 +464,19 @@ function updateViewBtns() {
 
 // Map view reads its coordinates straight from Data.xlsx (see scripts/geocode-data.js)
 initMap({ escHtml, showToast });
+
+// Full-screen map controls (they float over the map, outside the toolbar)
+$('map-close').addEventListener('click', () => { state.viewMode = 'table'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
+$('map-search').addEventListener('input', e => {
+  state.searchQuery = e.target.value.trim().toLowerCase();
+  state.page = 1;
+  applyFiltersAndRender();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && state.viewMode === 'map') {
+    state.viewMode = 'table'; updateViewBtns(); renderCurrentPage(); renderPagination();
+  }
+});
 
 // ── Export ─────────────────────────────────────────────────
 $('export-btn').addEventListener('click', () => {
@@ -756,7 +769,7 @@ function shareSelected() {
   }
   
   const selectedIndexes = Array.from(state.selectedRows).sort((a, b) => a - b);
-  const fields = ['Deal Name', 'Product Category', 'Speciality', 'Address'];
+  const fields = ['Deal Name', 'Product Purchased', 'Speciality', 'Address'];
 
   const selectedData = selectedIndexes
     .map(idx => state.filteredRows[idx])

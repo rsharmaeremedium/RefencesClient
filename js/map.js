@@ -44,7 +44,11 @@ function buildPins(rows) {
       byKey.set(key, pin);
     }
     const add = (list, v) => { v = String(v ?? '').trim(); if (v && !list.includes(v)) list.push(v); };
-    add(pin.products, row['Product Category']);
+    // the sheet renamed "Product Category" → "Product Purchased" — accept both.
+    // Some cells hold several products ("MedComm; MedXplain; Medio"); split them
+    // so each product keeps its own fixed colour in chips/legend.
+    String(row['Product Purchased'] ?? row['Product Category'] ?? '')
+      .split(/[;,]/).forEach(v => add(pin.products, v));
     add(pin.specialities, row.Speciality);
     add(pin.owners, row['Deal owner']);
     const n = parseFloat(String(row['Number of Screens'] ?? '').replace(/,/g, ''));
@@ -58,10 +62,18 @@ function buildPins(rows) {
   return [...byKey.values()];
 }
 
-// Deterministic colour per product so a product keeps its colour everywhere.
-const PALETTE = ['#1dc7d0', '#ff6b82', '#ffc65c', '#63d471', '#9d7bff', '#49ecff', '#ff9f4d', '#f472b6', '#a3e635', '#60a5fa'];
+// Fixed colour per product so a product always looks the same on the map,
+// in the legend and in popups. Unknown products fall back to the palette.
+const PRODUCT_COLORS = {
+  'MedComm': '#1dc7d0',     // teal
+  'MedXplain': '#ff6b82',   // coral
+  'Medio': '#ffc65c',       // amber
+  'MedEmbed': '#9d7bff',    // violet
+};
+const PALETTE = ['#63d471', '#49ecff', '#ff9f4d', '#f472b6', '#a3e635', '#60a5fa', '#e879f9', '#facc15'];
 function colorOf(product) {
-  const p = String(product ?? '');
+  const p = String(product ?? '').trim();
+  if (PRODUCT_COLORS[p]) return PRODUCT_COLORS[p];
   let h = 0;
   for (let i = 0; i < p.length; i++) h = (h * 31 + p.charCodeAt(i)) >>> 0;
   return PALETTE[h % PALETTE.length];
@@ -69,7 +81,9 @@ function colorOf(product) {
 
 function ensureMap() {
   if (map) return;
-  map = L.map('map', { zoomControl: true, worldCopyJump: true }).setView(INDIA, 5);
+  // zoom control bottom-left: the floating toolbar covers the top of the screen
+  map = L.map('map', { zoomControl: false, worldCopyJump: true }).setView(INDIA, 5);
+  L.control.zoom({ position: 'bottomleft' }).addTo(map);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
