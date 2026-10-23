@@ -1,5 +1,7 @@
 'use strict';
 
+import { initMap, renderMap } from './map.js';
+
 // ── State ──────────────────────────────────────────────────
 const state = {
   workbook: null,
@@ -12,7 +14,7 @@ const state = {
   filters: [],          // [{col, val}]
   sortCol: null,
   sortDir: 'asc',
-  viewMode: 'table',    // 'table' | 'grid'
+  viewMode: 'table',    // 'table' | 'grid' | 'map'
   page: 1,
   pageSize: 50,
   selectedRows: new Set(),  // Track selected row indices
@@ -450,13 +452,18 @@ function handleSort(col) {
 }
 
 // ── View Mode ──────────────────────────────────────────────
-$('view-table').addEventListener('click', () => { state.viewMode = 'table'; updateViewBtns(); renderCurrentPage(); });
-$('view-grid').addEventListener('click', () => { state.viewMode = 'grid'; updateViewBtns(); renderCurrentPage(); });
+$('view-table').addEventListener('click', () => { state.viewMode = 'table'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
+$('view-grid').addEventListener('click', () => { state.viewMode = 'grid'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
+$('view-map').addEventListener('click', () => { state.viewMode = 'map'; updateViewBtns(); renderCurrentPage(); renderPagination(); });
 
 function updateViewBtns() {
   $('view-table').classList.toggle('active', state.viewMode === 'table');
   $('view-grid').classList.toggle('active', state.viewMode === 'grid');
+  $('view-map').classList.toggle('active', state.viewMode === 'map');
 }
+
+// Map view reads its coordinates straight from Data.xlsx (see scripts/geocode-data.js)
+initMap({ escHtml, showToast });
 
 // ── Export ─────────────────────────────────────────────────
 $('export-btn').addEventListener('click', () => {
@@ -521,9 +528,11 @@ function updateStats() {
 
 // ── Pagination ─────────────────────────────────────────────
 function renderPagination() {
+  paginationEl.innerHTML = '';
+  if (state.viewMode === 'map') return;   // the map shows everything at once
+
   const total = state.filteredRows.length;
   const pages = Math.ceil(total / state.pageSize);
-  paginationEl.innerHTML = '';
   if (pages <= 1) return;
 
   const prev = document.createElement('button');
@@ -572,17 +581,23 @@ function pageRange(cur, total) {
 }
 
 function renderCurrentPage() {
+  const mapMode = state.viewMode === 'map';
+  tableContainer.classList.toggle('active', state.viewMode === 'table');
+  gridContainer.classList.toggle('active', state.viewMode === 'grid');
+  $('map-container').classList.toggle('active', mapMode);
+
+  if (mapMode) {
+    renderMap(state.filteredRows);
+    return;
+  }
+
   const start = (state.page - 1) * state.pageSize;
   const rows = state.filteredRows.slice(start, start + state.pageSize);
 
   if (state.viewMode === 'table') {
-    tableContainer.classList.add('active');
-    gridContainer.classList.remove('active');
     renderTable(rows);
     updateSelectedUI();
   } else {
-    tableContainer.classList.remove('active');
-    gridContainer.classList.add('active');
     renderGrid(rows);
   }
 }

@@ -754,3 +754,112 @@ mark {
     --row-hover: #f0f0fa;
   }
 }
+
+/* -- MAP VIEW -- */
+.map-container {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+.map-container.active { display: flex; }
+
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.map-btn {
+  padding: 7px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.map-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.map-status {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-left: auto;
+  font-family: 'DM Mono', monospace;
+}
+
+.map-status .warn { color: var(--accent3); }
+
+#map { flex: 1; min-height: 260px; }
+
+/* product-coloured pin */
+.pin-icon { background: none; border: none; }
+
+.pin-dot {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.map-legend {
+  position: absolute;
+  right: 10px;
+  bottom: 24px;
+  z-index: 1000;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 11.5px;
+  max-width: 210px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.map-legend div { display: flex; align-items: center; gap: 7px; margin: 3px 0; }
+
+.map-legend .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* popup */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.leaflet-popup-content { margin: 12px 14px; }
+
+.pin-pop h4 { margin: 0 0 6px; font-size: 13.5px; }
+
+.pop-chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0; }
+
+.pop-chip {
+  font-size: 10.5px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  background: var(--surface2);
+}
+
+.pop-note { font-size: 11px; color: var(--muted); font-style: italic; margin: 3px 0; }
+
+.pop-row { font-size: 12px; margin-top: 3px; }
+
+.pop-addr { font-size: 11.5px; color: var(--muted); margin-top: 7px; }

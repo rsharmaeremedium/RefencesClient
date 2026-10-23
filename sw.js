@@ -1,9 +1,20 @@
-const CACHE_NAME = 'excel-viewer-v4';
+const CACHE_NAME = 'excel-viewer-v5';
 const ASSETS = [
   './',
   './index.html',
   './css/style.css',
+  './css/leaflet.css',
+  './css/MarkerCluster.css',
+  './css/MarkerCluster.Default.css',
+  './css/images/layers.png',
+  './css/images/layers-2x.png',
+  './css/images/marker-icon.png',
+  './css/images/marker-icon-2x.png',
+  './css/images/marker-shadow.png',
   './js/app.js',
+  './js/map.js',
+  './js/leaflet.js',
+  './js/leaflet.markercluster.js',
   './manifest.json',
   './Data.xlsx',
   './icons/icon-192.png',
